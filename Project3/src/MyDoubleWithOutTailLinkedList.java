@@ -1,4 +1,3 @@
-
 import java.io.Serializable;
 import java.util.Random;
 
@@ -76,28 +75,18 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
         DNode temp = top;
 
-        for (int i = 0; i < index; i++){
-            temp = temp.getNext();
-        }
+        // more code here
 
-        temp.setData(null);
-
-
-            return null;
+        return null;
 
     }
 
     public Rental get(int index) {
 
-        DNode temp = top;
-
         if (top == null)
             return null;
 
-        for (int i = 0; i < index; i++)
-            temp = top.getNext();
-
-        return temp.getData();  // this line will need to be changed
+        return top.getData();  // this line will need to be changed
     }
 
     public void display() {

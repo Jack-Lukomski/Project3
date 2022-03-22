@@ -1,4 +1,5 @@
 
+
 import javax.swing.table.AbstractTableModel;
 import java.io.*;
 import java.text.DateFormat;
@@ -14,12 +15,12 @@ public class ListModel extends AbstractTableModel {
     /**
      * holds all the rentals
      */
-    private MyDoubleWithOutTailLinkedList listOfRentals;
+    private ArrayList<Rental> listOfRentals;
 
     /**
      * holds only the rentals that are to be displayed
      */
-    private MyDoubleWithOutTailLinkedList fileredListRentals;
+    private ArrayList<Rental> fileredListRentals;
 
     /**
      * current screen being displayed
@@ -36,8 +37,8 @@ public class ListModel extends AbstractTableModel {
 
     public ListModel() {
         display = ScreenDisplay.CurrentRentalStatus;
-        listOfRentals = new MyDoubleWithOutTailLinkedList();
-        fileredListRentals = new MyDoubleWithOutTailLinkedList();
+        listOfRentals = new ArrayList<Rental>();
+        fileredListRentals = new ArrayList<Rental>();
         UpdateScreen();
         createList();
     }
@@ -169,8 +170,8 @@ public class ListModel extends AbstractTableModel {
             case 5:
                 return (fileredListRentals.
                         get(row).getCost(fileredListRentals.get(row).
-                        actualDateReturned
-                ));
+                                actualDateReturned
+                        ));
 
             default:
                 throw new RuntimeException("Row,col out of range: " + row + " " + col);
@@ -194,7 +195,7 @@ public class ListModel extends AbstractTableModel {
         try {
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream os = new ObjectOutputStream(fos);
-              os.writeObject(listOfRentals);
+            os.writeObject(listOfRentals);
             os.close();
         } catch (IOException ex) {
             throw new RuntimeException("Saving problem! " + display);
@@ -208,7 +209,7 @@ public class ListModel extends AbstractTableModel {
             FileInputStream fis = new FileInputStream(filename);
             ObjectInputStream is = new ObjectInputStream(fis);
 
-            listOfRentals = (MyDoubleWithOutTailLinkedList) is.readObject();
+            listOfRentals = (ArrayList<Rental>) is.readObject();
             UpdateScreen();
             is.close();
         } catch (Exception ex) {
@@ -281,30 +282,30 @@ public class ListModel extends AbstractTableModel {
             add(console3);
             add(console4);
 
+            /*
+                These commented out code is to help with debugging for step 2 and Step 3
 
-                //These commented out code is to help with debugging for step 2 and Step 3
-                
-//                add(game1);
-//            add(game4);
-//            add(console1);
-//            listOfRentals.remove(0);
-//            add(console4);
-//            add(game5);
-//            add(game2);
-//            listOfRentals.remove(listOfRentals.size()-1);
-//            listOfRentals.remove(2);
-//            add(game3);
-//            add(console5);
-//            add(game6);
-//            add(console3);
-//            listOfRentals.remove(listOfRentals.size()-1);
-//            add(game7);
-//            add(console2);
-//            for (int i = 0; i < listOfRentals.size(); i++)
-//                System.out.println(listOfRentals.get(i).toString());
-                
-            
+                add(game1);
+            add(game4);
+            add(console1);
+            listOfRentals.remove(0);
+            add(console4);
+            add(game5);
+            add(game2);
+            listOfRentals.remove(listOfRentals.size()-1);
+            listOfRentals.remove(2);
+            add(game3);
+            add(console5);
+            add(game6);
+            add(console3);
+            listOfRentals.remove(listOfRentals.size()-1);
+            add(game7);
+            add(console2);
+            for (int i = 0; i < listOfRentals.size(); i++)
+                System.out.println(listOfRentals.get(i).toString());
 
+
+             */
             // create a bunch of them.
             int count = 0;
             Random rand = new Random(13);
