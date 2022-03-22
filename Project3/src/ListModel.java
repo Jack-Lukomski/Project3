@@ -15,12 +15,12 @@ public class ListModel extends AbstractTableModel {
     /**
      * holds all the rentals
      */
-    private ArrayList<Rental> listOfRentals;
+    private MyDoubleWithOutTailLinkedList listOfRentals;
 
     /**
      * holds only the rentals that are to be displayed
      */
-    private ArrayList<Rental> fileredListRentals;
+    private MyDoubleWithOutTailLinkedList fileredListRentals;
 
     /**
      * current screen being displayed
@@ -37,8 +37,8 @@ public class ListModel extends AbstractTableModel {
 
     public ListModel() {
         display = ScreenDisplay.CurrentRentalStatus;
-        listOfRentals = new ArrayList<Rental>();
-        fileredListRentals = new ArrayList<Rental>();
+        listOfRentals = new MyDoubleWithOutTailLinkedList();
+        fileredListRentals = new MyDoubleWithOutTailLinkedList();
         UpdateScreen();
         createList();
     }
@@ -209,7 +209,7 @@ public class ListModel extends AbstractTableModel {
             FileInputStream fis = new FileInputStream(filename);
             ObjectInputStream is = new ObjectInputStream(fis);
 
-            listOfRentals = (ArrayList<Rental>) is.readObject();
+            listOfRentals = (MyDoubleWithOutTailLinkedList) is.readObject();
             UpdateScreen();
             is.close();
         } catch (Exception ex) {
@@ -282,30 +282,30 @@ public class ListModel extends AbstractTableModel {
             add(console3);
             add(console4);
 
-            /*
-                These commented out code is to help with debugging for step 2 and Step 3
 
-                add(game1);
-            add(game4);
-            add(console1);
-            listOfRentals.remove(0);
-            add(console4);
-            add(game5);
-            add(game2);
-            listOfRentals.remove(listOfRentals.size()-1);
-            listOfRentals.remove(2);
-            add(game3);
-            add(console5);
-            add(game6);
-            add(console3);
-            listOfRentals.remove(listOfRentals.size()-1);
-            add(game7);
-            add(console2);
-            for (int i = 0; i < listOfRentals.size(); i++)
-                System.out.println(listOfRentals.get(i).toString());
+                //These commented out code is to help with debugging for step 2 and Step 3
+
+//            add(game1);
+//            add(game4);
+//            add(console1);
+//            listOfRentals.remove(0);
+//            add(console4);
+//            add(game5);
+//            add(game2);
+//            listOfRentals.remove(listOfRentals.size()-1);
+//            listOfRentals.remove(2);
+//            add(game3);
+//            add(console5);
+//            add(game6);
+//            add(console3);
+//            listOfRentals.remove(listOfRentals.size()-1);
+//            add(game7);
+//            add(console2);
+//            for (int i = 0; i < listOfRentals.size(); i++)
+//                System.out.println(listOfRentals.get(i).toString() + "\n");
 
 
-             */
+
             // create a bunch of them.
             int count = 0;
             Random rand = new Random(13);

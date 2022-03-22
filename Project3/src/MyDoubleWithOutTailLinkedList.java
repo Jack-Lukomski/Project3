@@ -66,6 +66,13 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
+        // s is a Console, and s goes on top
+        if (s instanceof Console && top.getData().getDueBack().after(s.dueBack)) {
+            top = new DNode(s, top, null);
+            top.getNext().setPrev(top);
+            return;
+        }
+
     }
 
     public Rental remove(int index) {
@@ -73,20 +80,62 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
         if (top == null)
             return null;
 
+        if (index > size() - 1)
+            return null;
+
+        if (size() == 1){
+            top = top.getNext();
+            return null;
+        }
+
+        if (index == size() - 1){
+            DNode b = getNode(index - 1);
+            b.setNext(null);
+            return null;
+        }
+
+          if (index == 0){
+            top = top.getNext();
+            top.setPrev(top.getPrev().getPrev());
+        }else {
+            DNode before = getNode(index - 1);
+            before.setNext(before.getNext().getNext());
+            before.getNext().setPrev(before);
+        }
+        return null;
+    }
+
+    public DNode getNode(int index){
+        if (top == null)
+            return null;
+
+        if (index > size())
+            return null;
+
         DNode temp = top;
 
-        // more code here
+        for (int i = 0; i < index; i++)
+            temp = temp.getNext();
 
-        return null;
+        return temp;
 
     }
 
     public Rental get(int index) {
 
+        if (index > size())
+            return null;
+
         if (top == null)
             return null;
 
-        return top.getData();  // this line will need to be changed
+        DNode temp = top;
+
+        for (int i = 0; i < index; i++){
+            temp = temp.getNext();
+        }
+
+        return temp.getData();
     }
 
     public void display() {
