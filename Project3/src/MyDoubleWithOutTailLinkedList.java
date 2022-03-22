@@ -73,6 +73,35 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
+        /****************** Need to double check ********************/
+
+
+        // list only has console and rental is a game
+        if(top.getData() instanceof Console && s instanceof Game){
+            top = new DNode(s,null, top);
+            top.getNext().setPrev(top);
+            return;
+        }
+
+        // list already has game and adding another game
+        if(top.getData() instanceof Game && s instanceof Game){
+            // sort by DueBack
+            if(top.getData().getDueBack().after(s.dueBack)){
+                top.getNext().setPrev(top);
+            }
+            return;
+        }
+
+        // list only has console and adding another console
+        /********* Need to check because currently last statement is void *******/
+        if(top.getData() instanceof Console && s instanceof Console){
+            //sort by DueBack
+            if(top.getData().getDueBack().after(s.dueBack)){
+                top.getNext().setPrev(top);
+            }
+            return;
+        }
+
     }
 
     public Rental remove(int index) {
