@@ -83,7 +83,7 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
-
+        /*** Committing ***/
 
         // s is a Game, and s goes on top
         if (s instanceof Game && top.getData().getDueBack().after(s.dueBack)) {
