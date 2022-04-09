@@ -52,12 +52,38 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
     public void add(Rental s) {
         DNode temp = top;
+        // adding a cousole and game on the same date does not work
 
         // no list
         if (top == null) {
             top = new DNode(s, null, null);
             return;
         }
+
+
+
+        // list only has console and rental is a game (CHECK)
+        if(top.getData() instanceof Console && s instanceof Game){
+            top = new DNode(s, top, null);
+            top.getNext().setPrev(top);
+            return;
+        }
+
+        // list has game and we want to add console
+//        if(top.getData() instanceof Game && s instanceof Console){
+//
+//            top = new DNode(s, null, top);
+//            top.getPrev().setNext(top);
+//            return;
+//        }
+
+        if (s instanceof Console && top.getData().getDueBack().after(s.dueBack)){
+            top = new DNode(s, top, null);
+            top.getNext().setPrev(top);
+            return;
+        }
+
+
 
         // s is a Game, and s goes on top
         if (s instanceof Game && top.getData().getDueBack().after(s.dueBack)) {
@@ -66,42 +92,61 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
-        // s is a Console, and s goes on top
-        if (s instanceof Console && top.getData().getDueBack().after(s.dueBack)) {
-            top = new DNode(s, top, null);
-            top.getNext().setPrev(top);
-            return;
-        }
+        /**** Case when date is before other game ****/
+//         s is a Game, and s goes at the bottom
+//        if (s instanceof Game && top.getData().getDueBack().before(s.dueBack)){
+//            top = new DNode(s, null, top);
+//            top.getPrev().setNext(top);
+//            return;
+//        }
+
+        /**** Case when date is before other Console ****/
+        // s is a Game, and s goes at the bottom
+//        if (s instanceof Console && top.getData().getDueBack().before(s.dueBack)){
+//            top = new DNode(s, null, top);
+//            top.getPrev().setNext(top);
+//            return;
+//        }
 
         /****************** Need to double check ********************/
 
-
-        // list only has console and rental is a game
-        if(top.getData() instanceof Console && s instanceof Game){
-            top = new DNode(s,null, top);
-            top.getNext().setPrev(top);
-            return;
-        }
-
-        // list already has game and adding another game
+         //list already has game and adding another game (after) (NOTE: not sorting by due date)
         if(top.getData() instanceof Game && s instanceof Game){
             // sort by DueBack
+            System.out.println("Before if statement " + top.toString());
             if(top.getData().getDueBack().after(s.dueBack)){
-                top.getNext().setPrev(top);
+                top = new DNode(s, null, top);
+                System.out.println("After if statement " + top.toString());
+                top.getPrev().setNext(top);
+                System.out.println("After setting arrows " + top.toString());
+                return;
             }
-            return;
+
+            if (top.getData().getDueBack().before(s.dueBack)){
+                top = new DNode(s, top, null);
+                top.getNext().setPrev(top);
+                return;
+            }
         }
 
-        // list only has console and adding another console
+        // list only has console and adding another console (NOTE: not sorting by due date)
         /********* Need to check because currently last statement is void *******/
         if(top.getData() instanceof Console && s instanceof Console){
-            //sort by DueBack
+            System.out.println("Before if statement " + top.toString());
             if(top.getData().getDueBack().after(s.dueBack)){
-                top.getNext().setPrev(top);
+                top = new DNode(s, null, top);
+                System.out.println("After if statement " + top.toString());
+                top.getPrev().setNext(top);
+                System.out.println("After setting arrows " + top.toString());
+                return;
             }
-            return;
-        }
 
+            if (top.getData().getDueBack().before(s.dueBack)){
+                top = new DNode(s, top, null);
+                top.getNext().setPrev(top);
+                return;
+            }
+        }
     }
 
     public Rental remove(int index) {
