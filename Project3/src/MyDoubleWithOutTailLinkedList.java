@@ -1,8 +1,12 @@
-import com.sun.org.glassfish.external.statistics.CountStatistic;
+ import com.sun.org.glassfish.external.statistics.CountStatistic;
 
-import java.io.Serializable;
-import java.util.Random;
-import java.util.concurrent.CountDownLatch;
+ import java.awt.event.ItemEvent;
+ import java.io.Console.*;
+ import java.io.Console.*;
+ import java.io.PushbackInputStream;
+ import java.io.Serializable;
+        import java.util.Random;
+        import java.util.concurrent.CountDownLatch;
 
 public class MyDoubleWithOutTailLinkedList implements Serializable {
 
@@ -55,7 +59,6 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
     public void add(Rental s) {
         DNode temp = top;
-        // adding a cousole and game on the same date does not work
 
         // no list
         if (top == null) {
@@ -63,114 +66,84 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
-
-
-        // list only has console and rental is a game (CHECK)
-//        if(top.getData() instanceof Console && s instanceof Game){
-//            top = new DNode(s, top, null);
-//            top.getNext().setPrev(top);
-//            return;
-//        }
-
-        // list has game and we want to add console
-//        if(top.getData() instanceof Game && s instanceof Console){
-//
-//            top = new DNode(s, null, top);
-//            top.getPrev().setNext(top);
-//            return;
-//        }
-
-        if (s instanceof Console && top.getData().getDueBack().after(s.dueBack)){
-            top = new DNode(s, top, null);
-            top.getNext().setPrev(top);
+        /** This adds a game if consoles are already added to the list **/
+        if (s instanceof Game && getEndList(top).getData() instanceof Console){
+            temp = new DNode(s, getBeginConsole(top), getEndGame(top));
+            temp.getPrev().setNext(temp);
+            temp.getNext().setPrev(temp);
             return;
         }
 
-        // s is a Game, and s goes on top
+//         s is a Game, and s goes on top
         if (s instanceof Game && top.getData().getDueBack().after(s.dueBack)) {
             top = new DNode(s, top, null);
             top.getNext().setPrev(top);
             return;
         }
-
-        /**** Case when date is before other game ****/
-//         s is a Game, and s goes at the bottom
-//        if (s instanceof Game && top.getData().getDueBack().before(s.dueBack)){
-//            top = new DNode(s, null, top);
-//            top.getPrev().setNext(top);
-//            return;
-//        }
-
-        /**** Case when date is before other Console ****/
-        // s is a Game, and s goes at the bottom
-//        if (s instanceof Console && top.getData().getDueBack().before(s.dueBack)){
-//            top = new DNode(s, null, top);
-//            top.getPrev().setNext(top);
-//            return;
-//        }
-
-        /****************** Need to double check ********************/
-
-         //list already has game and adding another game (after) (NOTE: not sorting by due date)
-        if(top.getData() instanceof Game && s instanceof Game){
-            // sort by DueBack
-            System.out.println("Before if statement " + top.toString());
-            if(top.getData().getDueBack().after(s.dueBack)){
-                top = new DNode(s, null, top);
-                System.out.println("After if statement " + top.toString());
-                top.getPrev().setNext(top);
-                System.out.println("After setting arrows " + top.toString());
-                return;
-            }
-
-            if (top.getData().getDueBack().before(s.dueBack)){
-                top = new DNode(s, top, null);
-                top.getNext().setPrev(top);
-                return;
-            }
+        /** If the first rental to add to the list is a game **/
+        if (s instanceof Game && size() == 1) {
+            temp = new DNode(s, null, top);
+            temp.getPrev().setNext(temp);
+            return;
         }
 
-        // list only has console and adding another console (NOTE: not sorting by due date)
-        /********* Need to check because currently last statement is void *******/
-        if(top.getData() instanceof Console && s instanceof Console){
-            System.out.println("Before if statement " + top.toString());
-            if(top.getData().getDueBack().after(s.dueBack)){
-                top = new DNode(s, null, top);
-                System.out.println("After if statement " + top.toString());
-                top.getPrev().setNext(top);
-                System.out.println("After setting arrows " + top.toString());
-                return;
+        /** If s is a game and the size is greater than zero, this sorts the games by date **/
+        if (s instanceof Game && size() > 1) {
+            for (int i = 1; i < size(); i++) {
+                if (temp.getData().getDueBack().after(s.dueBack)) {
+                    temp = new DNode(s, temp.getNext(), temp.getPrev());
+                    temp.getPrev().setNext(temp);
+                    temp.getNext().setPrev(temp);
+                }
+                temp = temp.getNext();
             }
-
-            if (top.getData().getDueBack().before(s.dueBack)){
-                top = new DNode(s, top, null);
-                top.getNext().setPrev(top);
-                return;
-            }
+            temp = new DNode(s, null, temp);
+            temp.getPrev().setNext(temp);
+            return;
         }
 
-        /** edits made on 14/10/2022 **/
-
-        // If we have a game, and we want to add a console -> game, console
-        if(top.getData() instanceof Game && s instanceof Console){
-        while (temp.getData() instanceof Console)
-            temp = temp.getPrev();
-
-            top = new DNode(s, temp, null);
-            top.getNext().setPrev(top);
-
+        /** This adds a console to the list, only after games **/
+        if (s instanceof Console){
+            temp = new DNode(s, null, getEndList(top));
+            temp.getPrev().setNext(temp);
         }
 
-        // If we have a console, and we want to add a game -> game, console
-        if(top.getData() instanceof Console && s instanceof Game){
-            while (temp.getData() instanceof Game)
-                temp = temp.getPrev();
+    }
 
-            top = new DNode(s, temp, null);
-            top.getNext().setPrev(top);
+    /*****************
+     *
+     * @param n
+     * @return The last game in the list
+     */
+    public static DNode getEndGame(DNode n){
+        try{
+            while (n.getNext().getData() instanceof Game)
+                n = n.getNext();
+        } catch (NullPointerException e){
 
         }
+        return n;
+    }
 
+    /***************
+     *
+     * @param n
+     * @return The first console on the list
+     */
+     public static DNode getBeginConsole(DNode n){
+        return getEndGame(n).getNext();
+     }
+
+    /************
+     *
+     * @param n
+     * @return The last node in the list
+     */
+    public static DNode getEndList(DNode n){
+            while (n.getNext() != null)
+                n = n.getNext();
+
+        return n;
     }
 
     public Rental remove(int index) {
@@ -192,7 +165,7 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return null;
         }
 
-          if (index == 0){
+        if (index == 0){
             top = top.getNext();
             top.setPrev(top.getPrev().getPrev());
         }else {
@@ -249,6 +222,15 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
                 "top=" + top +
                 ", size=" + size() +
                 '}';
+    }
+
+    public static int getSize(DNode n){
+        int count = 0;
+        while (n.getNext() != null) {
+            n = n.getNext();
+            count++;
+        }
+        return count;
     }
 
 }
