@@ -1,5 +1,8 @@
+import com.sun.org.glassfish.external.statistics.CountStatistic;
+
 import java.io.Serializable;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 public class MyDoubleWithOutTailLinkedList implements Serializable {
 
@@ -63,11 +66,11 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
 
         // list only has console and rental is a game (CHECK)
-        if(top.getData() instanceof Console && s instanceof Game){
-            top = new DNode(s, top, null);
-            top.getNext().setPrev(top);
-            return;
-        }
+//        if(top.getData() instanceof Console && s instanceof Game){
+//            top = new DNode(s, top, null);
+//            top.getNext().setPrev(top);
+//            return;
+//        }
 
         // list has game and we want to add console
 //        if(top.getData() instanceof Game && s instanceof Console){
@@ -82,8 +85,6 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             top.getNext().setPrev(top);
             return;
         }
-
-        /*** Committing ***/
 
         // s is a Game, and s goes on top
         if (s instanceof Game && top.getData().getDueBack().after(s.dueBack)) {
@@ -147,6 +148,29 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
                 return;
             }
         }
+
+        /** edits made on 14/10/2022 **/
+
+        // If we have a game, and we want to add a console -> game, console
+        if(top.getData() instanceof Game && s instanceof Console){
+        while (temp.getData() instanceof Console)
+            temp = temp.getPrev();
+
+            top = new DNode(s, temp, null);
+            top.getNext().setPrev(top);
+
+        }
+
+        // If we have a console, and we want to add a game -> game, console
+        if(top.getData() instanceof Console && s instanceof Game){
+            while (temp.getData() instanceof Game)
+                temp = temp.getPrev();
+
+            top = new DNode(s, temp, null);
+            top.getNext().setPrev(top);
+
+        }
+
     }
 
     public Rental remove(int index) {
