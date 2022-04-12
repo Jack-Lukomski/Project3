@@ -281,6 +281,7 @@ public class ListModel extends AbstractTableModel {
             add(console5);
             add(console3);
             add(console4);
+            //add(game2);
 
 
                 //These commented out code is to help with debugging for step 2 and Step 3
@@ -308,10 +309,10 @@ public class ListModel extends AbstractTableModel {
 
             // create a bunch of them.
             int count = 0;
-            Random rand = new Random(13);
+            Random rand = new Random(30);
             String guest = null;
 
-            while (count < 50) {
+            while (count < 30) {
                 Date date = df.parse("7/" + (rand.nextInt(10) + 2) + "/2020");
                 GregorianCalendar g = new GregorianCalendar();
                 g.setTime(date);

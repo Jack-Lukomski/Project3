@@ -1,15 +1,26 @@
- import com.sun.org.glassfish.external.statistics.CountStatistic;
+import com.sun.org.glassfish.external.statistics.CountStatistic;
+import javafx.scene.chart.ScatterChart;
+import org.omg.CORBA.NO_IMPLEMENT;
 
- import java.awt.event.ItemEvent;
- import java.io.Console.*;
- import java.io.Console.*;
- import java.io.PushbackInputStream;
- import java.io.Serializable;
-        import java.util.Random;
-        import java.util.concurrent.CountDownLatch;
+import java.awt.event.ItemEvent;
+import java.io.Console.*;
+import java.io.Console.*;
+import java.io.Console.*;
+import java.io.PushbackInputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
+/*********
+ * @Description This method creates the basic functionally
+ * of a linked list.
+ * @Author Jack Lukomski, Hector Garcia, Julia Garcia
+ * @Version 1.0
+ */
 public class MyDoubleWithOutTailLinkedList implements Serializable {
 
+    /** The top of the linked list **/
     private DNode top;
 
     public MyDoubleWithOutTailLinkedList() {
@@ -57,20 +68,17 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
         }
     }
 
+
+    /*************
+     * This method adds rentals to a list in order: games -> consoles
+     * This method sorts the due dates from most recent to least recent
+     * @param s The type of rental you would like to add
+     */
     public void add(Rental s) {
         DNode temp = top;
-
         // no list
         if (top == null) {
             top = new DNode(s, null, null);
-            return;
-        }
-
-        /** This adds a game if consoles are already added to the list **/
-        if (s instanceof Game && getEndList(top).getData() instanceof Console){
-            temp = new DNode(s, getBeginConsole(top), getEndGame(top));
-            temp.getPrev().setNext(temp);
-            temp.getNext().setPrev(temp);
             return;
         }
 
@@ -80,72 +88,169 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             top.getNext().setPrev(top);
             return;
         }
-        /** If the first rental to add to the list is a game **/
-        if (s instanceof Game && size() == 1) {
-            temp = new DNode(s, null, top);
+
+
+        //This adds a game if consoles are already added to the list
+        if (s instanceof Game && getEndList(top).getData() instanceof Console){
+            temp = new DNode(s, getBeginConsole(top), getEndGame(top));
             temp.getPrev().setNext(temp);
+            temp.getNext().setPrev(temp);
             return;
         }
 
-        /** If s is a game and the size is greater than zero, this sorts the games by date **/
-        if (s instanceof Game && size() > 1) {
-            for (int i = 1; i < size(); i++) {
-                if (temp.getData().getDueBack().after(s.dueBack)) {
-                    temp = new DNode(s, temp.getNext(), temp.getPrev());
-                    temp.getPrev().setNext(temp);
-                    temp.getNext().setPrev(temp);
-                }
-                temp = temp.getNext();
-            }
-            temp = new DNode(s, null, temp);
-            temp.getPrev().setNext(temp);
+
+        //Adds a game to the list and sorts it, the earliest due date is first
+        if (s instanceof Game && getEndList(top).getData() instanceof Game) {
+            DNode newNode = new DNode(s, null, null);
+            insertSort(temp, newNode);
+            sort(temp);
             return;
         }
 
-        /** This adds a console to the list, only after games **/
+        //This adds a console to the list, only after games
         if (s instanceof Console){
             temp = new DNode(s, null, getEndList(top));
             temp.getPrev().setNext(temp);
+            return;
         }
 
     }
 
+    private static DNode sortDateConsole(DNode head){
+        DNode temp = head;
+        if (head.getNext() == null)
+            return head;
+
+        System.out.println(head.getNext());
+        try {
+            while (head.getNext() != null) {
+                if (head.getData().getDueBack().after(head.getNext().getData().getDueBack()) && head.getNext() != null) {
+                    head.getNext().setNext(head);
+                    head.getNext().setPrev(head);
+                    head.getPrev().setPrev(head.getNext());
+                    head.getPrev().setNext(head.getNext());
+                }
+               // head = head.getNext();
+            }
+        }catch (NullPointerException ignore){}
+
+        return head;
+
+    }
+
+    /*****
+     * @param top the head of the linked list
+     * @param newNode the node that is to be added
+     * @return the new sorted list
+     */
+    private static DNode insertSort (DNode top, DNode newNode){
+        DNode curr;
+
+        if (top == null)
+            top = newNode;
+
+        else if (top.getData().getDueBack().after(newNode.getData().getDueBack())){
+            newNode.setNext(top);
+            newNode.getNext().setPrev(newNode);
+            top = newNode;
+        }
+        else {
+            curr = top;
+            while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()))
+                curr = curr.getNext();
+
+            newNode.setNext(curr.getNext());
+
+            if (curr.getNext() != null)
+                newNode.getNext().setPrev(newNode);
+
+            curr.setNext(newNode);
+            newNode.setPrev(curr);
+        }
+        return top;
+    }
+
+    /******
+     * @param top the head of the linked list
+     * @return the sorted list in order
+     */
+    private static DNode sort (DNode top){
+        DNode sorted = null;
+
+        DNode current = top;
+        while (current != null && current.getData() instanceof Game){
+            DNode next = current.getNext();
+            current.setPrev(null);
+            current.setNext(null);
+            sorted = insertSort(sorted, current);
+            current = next;
+        }
+        top = sorted;
+
+        return top;
+    }
+
+    /***
+     * This method sorts only the consoles
+     * @param top the head of the linked list
+     * @return the sorted list only for the consoles
+     */
+    private static DNode sortConsole (DNode top){
+        DNode sorted = null;
+
+        DNode current = top;
+        while (current != null && current.getData() instanceof Console){
+            DNode next = current.getNext();
+            current.setPrev(null);
+            current.setNext(null);
+            sorted = insertSort(sorted, current);
+            current = next;
+        }
+        top = sorted;
+
+        return top;
+    }
+
+
     /*****************
-     *
+     * This method returns the last game in the list
      * @param n
      * @return The last game in the list
      */
-    public static DNode getEndGame(DNode n){
+    private static DNode getEndGame(DNode n){
         try{
             while (n.getNext().getData() instanceof Game)
                 n = n.getNext();
-        } catch (NullPointerException e){
-
-        }
+        } catch (NullPointerException ignored){}
         return n;
     }
 
     /***************
-     *
+     * This method returns the first item in the console list
      * @param n
      * @return The first console on the list
      */
-     public static DNode getBeginConsole(DNode n){
+    private static DNode getBeginConsole(DNode n){
         return getEndGame(n).getNext();
-     }
+    }
 
     /************
-     *
+     * This method returns last node in the list
      * @param n
      * @return The last node in the list
      */
-    public static DNode getEndList(DNode n){
-            while (n.getNext() != null)
-                n = n.getNext();
+    private static DNode getEndList(DNode n){
+        while (n.getNext() != null)
+            n = n.getNext();
 
         return n;
     }
 
+    /******
+     * This method removes rentals from the linked list.
+     * @param index The index where the data is wanted to be removed at
+     * @return null if it was a success
+     */
     public Rental remove(int index) {
 
         if (top == null)
