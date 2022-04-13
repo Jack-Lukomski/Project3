@@ -82,63 +82,21 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             return;
         }
 
-//         s is a Game, and s goes on top
+        // s is a Game, and s goes on top
         if (s instanceof Game && top.getData().getDueBack().after(s.dueBack)) {
             top = new DNode(s, top, null);
             top.getNext().setPrev(top);
             return;
         }
 
-
-        //This adds a game if consoles are already added to the list
-        if (s instanceof Game && getEndList(top).getData() instanceof Console){
-            temp = new DNode(s, getBeginConsole(top), getEndGame(top));
-            temp.getPrev().setNext(temp);
-            temp.getNext().setPrev(temp);
-            return;
-        }
-
-
-        //Adds a game to the list and sorts it, the earliest due date is first
-        if (s instanceof Game && getEndList(top).getData() instanceof Game) {
             DNode newNode = new DNode(s, null, null);
             insertSort(temp, newNode);
-            sort(temp);
-            return;
-        }
-
-        //This adds a console to the list, only after games
-        if (s instanceof Console){
-            temp = new DNode(s, null, getEndList(top));
-            temp.getPrev().setNext(temp);
-            return;
-        }
-
-    }
-
-    private static DNode sortDateConsole(DNode head){
-        DNode temp = head;
-        if (head.getNext() == null)
-            return head;
-
-        System.out.println(head.getNext());
-        try {
-            while (head.getNext() != null) {
-                if (head.getData().getDueBack().after(head.getNext().getData().getDueBack()) && head.getNext() != null) {
-                    head.getNext().setNext(head);
-                    head.getNext().setPrev(head);
-                    head.getPrev().setPrev(head.getNext());
-                    head.getPrev().setNext(head.getNext());
-                }
-               // head = head.getNext();
-            }
-        }catch (NullPointerException ignore){}
-
-        return head;
-
     }
 
     /*****
+     * This method sorts the list with the priority of games begin first
+     * and consoles being second. When you add a new node to the list,
+     * this method sorts by the date of the node added.
      * @param top the head of the linked list
      * @param newNode the node that is to be added
      * @return the new sorted list
@@ -148,69 +106,36 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
         if (top == null)
             top = newNode;
-
-        else if (top.getData().getDueBack().after(newNode.getData().getDueBack())){
-            newNode.setNext(top);
-            newNode.getNext().setPrev(newNode);
-            top = newNode;
-        }
         else {
             curr = top;
-            while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()))
-                curr = curr.getNext();
+            if (newNode.getData() instanceof Game) {
+                while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) && curr.getNext().getData() instanceof Game)
+                    curr = curr.getNext();
 
-            newNode.setNext(curr.getNext());
+                newNode.setNext(curr.getNext());
 
-            if (curr.getNext() != null)
-                newNode.getNext().setPrev(newNode);
+                if (curr.getNext() != null)
+                    newNode.getNext().setPrev(newNode);
 
-            curr.setNext(newNode);
-            newNode.setPrev(curr);
+                curr.setNext(newNode);
+                newNode.setPrev(curr);
+            }
+            else if (newNode.getData() instanceof Console){
+                curr = getEndGame(curr);
+                while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) && curr.getNext().getData() instanceof Console)
+                    curr = curr.getNext();
+
+                newNode.setNext(curr.getNext());
+
+                if (curr.getNext() != null)
+                    newNode.getNext().setPrev(newNode);
+
+                curr.setNext(newNode);
+                newNode.setPrev(curr);
+            }
         }
         return top;
     }
-
-    /******
-     * @param top the head of the linked list
-     * @return the sorted list in order
-     */
-    private static DNode sort (DNode top){
-        DNode sorted = null;
-
-        DNode current = top;
-        while (current != null && current.getData() instanceof Game){
-            DNode next = current.getNext();
-            current.setPrev(null);
-            current.setNext(null);
-            sorted = insertSort(sorted, current);
-            current = next;
-        }
-        top = sorted;
-
-        return top;
-    }
-
-    /***
-     * This method sorts only the consoles
-     * @param top the head of the linked list
-     * @return the sorted list only for the consoles
-     */
-    private static DNode sortConsole (DNode top){
-        DNode sorted = null;
-
-        DNode current = top;
-        while (current != null && current.getData() instanceof Console){
-            DNode next = current.getNext();
-            current.setPrev(null);
-            current.setNext(null);
-            sorted = insertSort(sorted, current);
-            current = next;
-        }
-        top = sorted;
-
-        return top;
-    }
-
 
     /*****************
      * This method returns the last game in the list
