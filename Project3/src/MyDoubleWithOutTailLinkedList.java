@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.jar.JarEntry;
 
 /*********
  * @Description This method creates the basic functionally
@@ -34,6 +35,7 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
         int total = 0;
         DNode temp = top;
+
         while (temp != null) {
             total++;
             temp = temp.getNext();
@@ -70,8 +72,10 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
 
 
     /*************
-     * This method adds rentals to a list in order: games -> consoles
-     * This method sorts the due dates from most recent to least recent
+     * This method creates a new node with the Rental data
+     * passed into it. The previous and next values are
+     * set to null because we do not know where we want
+     * the Rental to be.
      * @param s The type of rental you would like to add
      */
     public void add(Rental s) {
@@ -88,18 +92,21 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             top.getNext().setPrev(top);
             return;
         }
-
+            // Creating a new node with rental data, we do not know where we
+            // want the node to go yet, so we set the prev and next to null.
             DNode newNode = new DNode(s, null, null);
             insertSort(temp, newNode);
     }
 
     /*****
      * This method sorts the list with the priority of games begin first
-     * and consoles being second. When you add a new node to the list,
-     * this method sorts by the date of the node added.
+     * and consoles being second. Along with sorting the games and consoles,
+     * it also sorts based on due date, still keeping the same parameters.
+     * Also, if the due dates are equal, this method will sort by name in
+     * alphabetical order.
      * @param top the head of the linked list
-     * @param newNode the node that is to be added
-     * @return the new sorted list
+     * @param newNode the node that is to be added, next and prev are set to null
+     * @return the new sorted list, following the guidelines
      */
     private static DNode insertSort (DNode top, DNode newNode){
         DNode curr;
@@ -108,21 +115,36 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             top = newNode;
         else {
             curr = top;
+            // Case when the node we want to add to the list is a game
             if (newNode.getData() instanceof Game) {
-                while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) && curr.getNext().getData() instanceof Game)
+                // This while sets curr to the next value when the next value is null, and the curr's next due date is before the
+                // new nodes, or the curr next is equal to the new nodes due back, and the new node's name of renter is alphabetically
+                // less that the curr next's name of renter, and the curr next is an instance of a game.
+                while (curr.getNext() != null && (curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) ||
+                        (curr.getNext().getData().getDueBack().equals(newNode.getData().getDueBack()) &&
+                                newNode.getData().getNameOfRenter().compareTo(curr.getNext().getData().getNameOfRenter()) > 0)) &&
+                                    curr.getNext().getData() instanceof Game)
                     curr = curr.getNext();
 
-                newNode.setNext(curr.getNext());
+                    newNode.setNext(curr.getNext());
 
-                if (curr.getNext() != null)
-                    newNode.getNext().setPrev(newNode);
+                    if (curr.getNext() != null)
+                        newNode.getNext().setPrev(newNode);
 
-                curr.setNext(newNode);
-                newNode.setPrev(curr);
+                    curr.setNext(newNode);
+                    newNode.setPrev(curr);
             }
+            // Case when the new node we want to add to the list is a console
             else if (newNode.getData() instanceof Console){
+                // This sets the curr node to be the end of the list of games, this is because consoles come after games
                 curr = getEndGame(curr);
-                while (curr.getNext() != null && curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) && curr.getNext().getData() instanceof Console)
+                // This while sets curr to the next value when the next value is null, and the curr's next due date is before the
+                // new nodes, or the curr next is equal to the new nodes due back, and the new node's name of renter is alphabetically
+                // less that the curr next's name of renter, and the curr next is an instance of a Console.
+                while (curr.getNext() != null && (curr.getNext().getData().getDueBack().before(newNode.getData().getDueBack()) ||
+                        (curr.getNext().getData().getDueBack().equals(newNode.getData().getDueBack()) &&
+                                newNode.getData().getNameOfRenter().compareTo(curr.getNext().getData().getNameOfRenter()) > 0)) &&
+                                    curr.getNext().getData() instanceof Console)
                     curr = curr.getNext();
 
                 newNode.setNext(curr.getNext());
@@ -138,7 +160,8 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
     }
 
     /*****************
-     * This method returns the last game in the list
+     * This method returns the last game in the list, it is used
+     * to get the top of the consoles in the list
      * @param n
      * @return The last game in the list
      */
@@ -147,27 +170,6 @@ public class MyDoubleWithOutTailLinkedList implements Serializable {
             while (n.getNext().getData() instanceof Game)
                 n = n.getNext();
         } catch (NullPointerException ignored){}
-        return n;
-    }
-
-    /***************
-     * This method returns the first item in the console list
-     * @param n
-     * @return The first console on the list
-     */
-    private static DNode getBeginConsole(DNode n){
-        return getEndGame(n).getNext();
-    }
-
-    /************
-     * This method returns last node in the list
-     * @param n
-     * @return The last node in the list
-     */
-    private static DNode getEndList(DNode n){
-        while (n.getNext() != null)
-            n = n.getNext();
-
         return n;
     }
 
